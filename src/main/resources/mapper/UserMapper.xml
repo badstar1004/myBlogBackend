@@ -1,0 +1,32 @@
+<!-- PostMapper.xml -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.mapper.user.UserMapper">
+
+    <select id="getUserById" parameterType="Long" resultType="com.example.demo.domain.User">
+        SELECT * FROM userprofile WHERE user_id = #{userId}
+    </select>
+
+    <select id="getAllUser" resultType="com.example.demo.domain.User">
+        SELECT * FROM userprofile
+    </select>
+
+    <!--  유저 페이징 조회  -->
+    <select id="getUserPaging" resultType="com.example.demo.domain.User">
+        SELECT *
+        FROM userprofile
+        <if test="sort != null and sort.size() > 0">
+            ORDER BY
+            <foreach item="criteria" collection="sort" separator=",">
+                ${criteria} ${order[sort.indexOf(criteria)]}
+            </foreach>
+        </if>
+        <if test="offset != null">
+            OFFSET #{offset} ROWS
+        </if>
+        <if test="page != null" >
+            FETCH NEXT #{page} ROWS ONLY
+        </if>
+    </select>
+
+</mapper>

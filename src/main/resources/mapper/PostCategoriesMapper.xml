@@ -1,0 +1,13 @@
+<!-- PostMapper.xml -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.mapper.postcategories.PostCategoriesMapper">
+
+    <select id="getPostCategoriesByCategoryId" resultType="com.example.demo.domain.PostCategories">
+        SELECT * FROM postcategories WHERE category_id = #{category_id}
+    </select>
+
+    <delete id="deletePostCategoriesByPost" parameterType="Long">
+        DELETE FROM postcategories WHERE post_id = #{postId}
+    </delete>
+</mapper>

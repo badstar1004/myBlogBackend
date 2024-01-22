@@ -1,0 +1,59 @@
+// 1. 공개된 모든 게시물 조회
+GET http://localhost:8080/posts/public-posts
+Accept: application/json
+
+###
+// 2. 특정 사용자의 게시물 조회
+GET http://localhost:8080/users/2/posts
+Accept: application/json
+
+###
+// 3. 상위 5개 게시물 조회
+GET http://localhost:8080/posts/top-posts
+Accept: application/json
+
+###
+// 4. 특정 카테고리에 속하는 게시물 조회
+GET http://localhost:8080/posts/JAVA/posts-category
+Accept: application/json
+
+###
+// 5. 각 사용자별 게시물 수 조회
+GET http://localhost:8080/users/posts-count
+Accept: application/json
+
+###
+// 6. 특정 게시물에 대한 모든 댓글 조회
+GET http://localhost:8080/posts/22/comments
+Accept: application/json
+
+###
+// 7. 특정 사용자의 최근 게시물 조회
+GET http://localhost:8080/users/2/recent
+Accept: application/json
+
+###
+// 8. 각 게시물별 댓글 수 조회
+GET http://localhost:8080/posts/comment-count
+Accept: application/json
+
+###
+// 9. 특정 카테고리의 게시물 중 가장 많이 조회된 게시물
+GET http://localhost:8080/categories/2/popular-post
+Accept: application/json
+
+###
+// 10. 특정 기간 동안 작성된 게시물 조회
+GET http://localhost:8080/posts/specific-period
+Accept: application/json
+
+###
+// 11. 다수의 게시물 조회
+GET http://localhost:8080/posts/posts-paging
+Accept: application/json
+
+###
+// 12. 다수의 사용자 조회
+GET http://localhost:8080/users/users-paging
+Accept: application/json
+

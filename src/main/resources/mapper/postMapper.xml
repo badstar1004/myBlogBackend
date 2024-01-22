@@ -1,0 +1,94 @@
+<!-- PostMapper.xml -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.mapper.post.PostMapper">
+
+  <select id="getPostById" parameterType="Long" resultType="com.example.demo.domain.Post">
+    SELECT * FROM posts WHERE post_id = #{postId}
+  </select>
+
+  <select id="getAllPosts" resultType="com.example.demo.domain.Post">
+    SELECT * FROM posts
+  </select>
+
+  <!--  public 게시물  -->
+  <select id="getPublicPosts" resultType="com.example.demo.dto.post.PostListDto">
+    SELECT title, content, view_count FROM posts WHERE status = 'public'
+  </select>
+
+  <!--  userId 기준 postList  -->
+  <select id="getPostByUserId" resultType="com.example.demo.domain.Post">
+    SELECT * FROM posts WHERE user_id = #{userId}
+  </select>
+
+  <!--  상위 n개 게시물  -->
+  <select id="getPostTop" resultType="com.example.demo.dto.post.PostTitleViewCountDto">
+    SELECT title, view_count FROM posts ORDER BY view_count DESC FETCH FIRST 5 ROWS ONLY
+  </select>
+
+  <!-- categoryId 기준 게시물 조회 -->
+  <select id="getPostByCategoryId" resultType="com.example.demo.domain.Post">
+    SELECT P.* FROM posts P JOIN postcategories PC ON P.post_id = PC.post_id WHERE PC.category_id = #{categoryId}
+  </select>
+
+  <!-- userId 기준 게시물 조회 (IN) -->
+  <select id="getPostInUserIds" resultType="com.example.demo.domain.Post">
+    SELECT * FROM posts WHERE user_id IN
+                              <foreach item="userId" collection="userIdList" open="(" separator="," close=")">
+                                #{userId}
+                              </foreach>
+                        ORDER BY user_id
+  </select>
+
+  <!-- userId 기준 최근 게시물 조회 -->
+  <select id="getUserPostRecent" resultType="com.example.demo.dto.post.PostTitleContentCreatedAtDto">
+    SELECT title, content, created_at FROM posts WHERE user_id = #{userId} ORDER BY created_at DESC FETCH FIRST 3 ROWS ONLY
+  </select>
+
+  <!-- postId 기준 인기 게시물 조회 (IN) -->
+  <select id="getPopularPostInPostIds" resultType="com.example.demo.dto.post.PostTitleViewCountDto">
+    SELECT title, view_count FROM posts WHERE post_id IN
+    <foreach item="postId" collection="postIdList" open="(" separator="," close=")">
+      #{postId}
+    </foreach>
+    ORDER BY view_count DESC FETCH FIRST 1 ROWS ONLY
+  </select>
+
+  <!-- 한달 동안 작성된 게시물 조회 -->
+  <select id="getPostPeriod" resultType="com.example.demo.dto.post.PostTitleCreatedAtDto">
+    SELECT title, created_at FROM posts WHERE created_at >= (CURRENT_TIMESTAMP - INTERVAL '1' MONTH)
+  </select>
+
+  <!-- 게시판 페이징 조회 -->
+  <select id="getPostsPaging" resultType="com.example.demo.domain.Post">
+    SELECT *
+      FROM posts
+      <if test="sort != null and sort.size() > 0">
+        ORDER BY
+            <foreach item="criteria" collection="sort" separator=",">
+                ${criteria} ${order[sort.indexOf(criteria)]}
+            </foreach>
+      </if>
+      <if test="offset != null">
+        OFFSET #{offset} ROWS
+      </if>
+      <if test="page != null" >
+        FETCH NEXT #{page} ROWS ONLY
+      </if>
+  </select>
+
+
+
+  <insert id="createPost" parameterType="com.example.demo.domain.Post">
+    INSERT INTO posts (post_id, user_id, title, content, status, view_count) VALUES (#{postId},#{userId},#{title}, #{content}, #{status} , #{viewCount})
+  </insert>
+
+  <update id="updatePost" parameterType="com.example.demo.domain.Post">
+    UPDATE posts SET title = #{title}, content = #{content} WHERE post_id = #{postId}
+  </update>
+
+  <delete id="deletePost" parameterType="Long">
+    DELETE FROM posts WHERE post_id = #{postId}
+  </delete>
+
+</mapper>

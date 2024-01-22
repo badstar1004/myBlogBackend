@@ -1,0 +1,16 @@
+<!-- CategoriesMapper.xml -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.mapper.categories.CategoriesMapper">
+
+  <!-- id로 조회 -->
+  <select id="getCategoriesById" resultType="com.example.demo.domain.Categories">
+    SELECT * FROM categories WHERE category_id = #{categoryId}
+  </select>
+
+  <!-- name으로 조회 -->
+  <select id="getCategoriesByName" resultType="com.example.demo.domain.Categories">
+    SELECT * FROM categories WHERE name = #{name}
+  </select>
+
+</mapper>

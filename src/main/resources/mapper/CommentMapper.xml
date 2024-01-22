@@ -1,0 +1,22 @@
+<!-- PostMapper.xml -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.mapper.comment.CommentMapper">
+
+  <!-- postId 기준 조회 -->
+  <select id="getCommentsByPostId" resultType="com.example.demo.domain.Comments">
+    SELECT * FROM comments WHERE post_id = #{postId}
+  </select>
+
+  <select id="getCommentsInPostId" resultType="com.example.demo.domain.Comments">
+    SELECT * FROM comments WHERE post_id IN
+                                 <foreach item="postId" collection="postIdList" open="(" separator="," close=")">
+                                    #{postId}
+                                 </foreach>
+                           ORDER BY post_id
+  </select>
+
+	<delete id="deleteCommentsByPost" parameterType="Long">
+        DELETE FROM comments WHERE post_id = #{postId}
+  </delete>
+</mapper>
