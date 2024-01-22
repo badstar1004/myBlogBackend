@@ -2,9 +2,9 @@ package com.example.demo.controller;
 
 import com.example.demo.domain.Comments;
 import com.example.demo.domain.Post;
+import com.example.demo.domain.PostCategories;
 import com.example.demo.dto.post.PostByCategoriesDto;
 import com.example.demo.dto.post.PostCommentCountDto;
-import com.example.demo.dto.post.PostDto;
 import com.example.demo.dto.post.PostListDto;
 import com.example.demo.dto.post.PostTitleCreatedAtDto;
 import com.example.demo.dto.post.PostTitleViewCountDto;
@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -144,6 +145,46 @@ public class PostsController {
         return new ResponseEntity<>(postsPaging, HttpStatus.OK);
     }
 
+    // 수정
+    // 1. 특정 게시물의 조회수 증가
+    @PatchMapping("/{postId}")
+    public ResponseEntity<Post> updatePostViewCount(@PathVariable Long postId) {
+        Post post = postsService.updatePostViewCount(postId);
+        if (post == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(post, HttpStatus.OK);
+    }
+
+    // 수정
+    // 2. 특정 카테고리의 모든 게시물 상태 변경
+    @PatchMapping("/posts-status")
+    public ResponseEntity<List<Post>> updatePostStatus() {
+        List<Post> postList = postsService.updatePostStatus();
+        if(postList == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(postList, HttpStatus.OK);
+    }
+
+    // 수정
+    // 3. 게시물의 상태에 따른 카테고리 변경
+    @PatchMapping("/posts-category")
+    public ResponseEntity<List<PostCategories>> updatePostCategory() {
+        List<PostCategories> postCategoriesList = postsService.updatePostCategory();
+        if(postCategoriesList == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(postCategoriesList, HttpStatus.OK);
+    }
+
+
+
+
+
     // 게시물 조회 (GET)
     @GetMapping("/{postId}") //같은 경로를 사용하더라도 http mathod로 오버로딩 가능
     public ResponseEntity<Post> getPost(@PathVariable(name="postId") Long postId) {
@@ -157,7 +198,7 @@ public class PostsController {
 
     // 게시물 수정 (PUT)
     @PutMapping("/{postId}")
-    public ResponseEntity<Post> updatePost(@PathVariable(name="postId") Long postId, @RequestBody Post updatedPost) {
+    public ResponseEntity<Post> updatePost(@PathVariable(name="postId") Long postId, Post updatedPost) {
         int postUpdateCount = postsService.updatePost(postId, updatedPost);
         if (postUpdateCount <= 0) {
             return new ResponseEntity<>(HttpStatus.OK);

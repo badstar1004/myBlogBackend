@@ -3,11 +3,38 @@
 
 <mapper namespace="com.example.demo.mapper.postcategories.PostCategoriesMapper">
 
-    <select id="getPostCategoriesByCategoryId" resultType="com.example.demo.domain.PostCategories">
-        SELECT * FROM postcategories WHERE category_id = #{category_id}
-    </select>
+  <select id="getPostCategoriesByCategoryId" resultType="com.example.demo.domain.PostCategories">
+      SELECT * FROM postcategories WHERE category_id = #{category_id}
+  </select>
 
-    <delete id="deletePostCategoriesByPost" parameterType="Long">
-        DELETE FROM postcategories WHERE post_id = #{postId}
-    </delete>
+  <select id="getPostCategoriesByCategoryName" resultType="com.example.demo.domain.PostCategories">
+      SELECT PC.*
+        FROM postcategories   PC
+        JOIN categories       C
+          ON PC.category_id   = C.category_id
+       WHERE C.name = '공지사항'
+  </select>
+
+  <delete id="deletePostCategoriesByPost" parameterType="Long">
+      DELETE FROM postcategories WHERE post_id = #{postId}
+  </delete>
+
+  <update id="updatePostCategoriesInPostIds" parameterType="long">
+    UPDATE postcategories
+       SET category_id = #{categoryId}
+     WHERE post_id IN
+           <foreach item="postId" collection="postIds" open="(" separator="," close=")">
+            #{postId}
+           </foreach>
+  </update>
+
+  <select id="getPostCategoriesInCategoryId" parameterType="long">
+    SELECT *
+      FROM postcategories
+     WHERE post_Id IN
+           <foreach item="postId" collection="postIds" open="(" separator="," close=")">
+            #{postId}
+           </foreach>
+  </select>
+
 </mapper>
