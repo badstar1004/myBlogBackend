@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.domain.Categories;
 import com.example.demo.domain.Comments;
 import com.example.demo.domain.Post;
+import com.example.demo.domain.PostCategories;
 import com.example.demo.dto.post.PostByCategoriesDto;
 import com.example.demo.dto.post.PostCommentCountDto;
 import com.example.demo.dto.post.PostDto;
@@ -10,6 +11,7 @@ import com.example.demo.dto.post.PostListDto;
 import com.example.demo.dto.post.PostTitleContentCreatedAtDto;
 import com.example.demo.dto.post.PostTitleCreatedAtDto;
 import com.example.demo.dto.post.PostTitleViewCountDto;
+import com.example.demo.mapper.categories.CategoriesMapper;
 import com.example.demo.mapper.comment.CommentMapper;
 import com.example.demo.mapper.post.PostMapper;
 import com.example.demo.mapper.postcategories.PostCategoriesMapper;
@@ -37,6 +39,9 @@ public class PostService {
     private CategoriesService categoriesService;
 
     @Autowired
+    private CategoriesMapper categoriesMapper;
+
+    @Autowired
     private CommentsService commentsService;
 
     // 게시물 조회 메서드
@@ -56,8 +61,7 @@ public class PostService {
 
     // 게시물 수정 메서드
     public int updatePost(Long postId, Post post) {
-
-        return postMapper.updatePost(post);
+        return postMapper.updatePost(postId, post);
     }
 
     // 게시물 삭제 메서드
@@ -141,6 +145,41 @@ public class PostService {
 
     public List<Post> getPostsPaging(Map<String, Object> pagingMap) {
         return postMapper.getPostsPaging(pagingMap);
+    }
+
+    // 조회수 업데이트
+    @Transactional
+    public Post updatePostViewCount(Long postId) {
+        int updateCount = postMapper.updatePostViewCount(postId);
+
+        // 업데이트된 게시물 조회
+        return updateCount > 0 ? postMapper.getPostById(postId) : null;
+    }
+
+    @Transactional
+    public List<Post> updatePostStatus() {
+        List<PostCategories> postCategoriesList = postCategoriesMapper.getPostCategoriesByCategoryName();
+
+        List<Long> postIds = postCategoriesList.stream()
+            .map(PostCategories::getPostId).collect(Collectors.toList());
+
+        int updateCount = postMapper.updatePostStatusInPostIds(postIds);
+
+        return updateCount > 0 ? postMapper.getPostInPostIds(postIds) : null;
+    }
+
+    @Transactional
+    public List<PostCategories> updatePostCategory() {
+        // 'draft' 상태의 게시물 조회
+        List<Post> postList = postMapper.findPostIdsByStatus("draft");
+        Categories categories = categoriesMapper.getCategoriesByName("임시저장");
+
+        List<Long> postIds = postList.stream().map(Post::getPostId).toList();
+        // IN 연산자를 사용하여 여러 게시물의 카테고리 업데이트
+        int updateCount =
+            postCategoriesMapper.updatePostCategoriesInPostIds(postIds, categories.getCategoryId());
+
+        return updateCount > 0 ? postCategoriesMapper.getPostCategoriesInCategoryId(postIds) : null;
     }
 }
 

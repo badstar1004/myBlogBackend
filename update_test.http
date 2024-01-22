@@ -1,0 +1,13 @@
+// 1. 특정 게시물의 조회수 증가
+PATCH http://localhost:8080/posts/22
+Content-Type: application/json
+
+###
+// 2. 특정 카테고리의 모든 게시물 상태 변경
+PATCH http://localhost:8080/posts/posts-status
+Content-Type: application/json
+
+###
+// 3. 게시물의 상태에 따른 카테고리 변경
+PATCH http://localhost:8080/posts/posts-category
+Content-Type: application/json
