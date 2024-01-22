@@ -77,6 +77,32 @@
       </if>
   </select>
 
+  <!-- 조회수 1증가 업데이트 -->
+  <update id="updatePostViewCount" parameterType="long">
+    UPDATE posts SET view_count = view_count + 1, updated_at = current_date WHERE post_id = #{postId}
+  </update>
+
+  <!-- postId 기준 조회 (IN) -->
+  <select id="getPostInPostIds" resultType="com.example.demo.domain.Post">
+    SELECT * FROM posts WHERE post_id IN
+                              <foreach item="postId" collection="postIds" open="(" separator="," close=")">
+                                #{postId}
+                              </foreach>
+  </select>
+
+  <!-- status = public 으로 업데이트 -->
+  <update id="updatePostStatusInPostIds" parameterType="long">
+    UPDATE posts SET status = 'public', updated_at = current_date
+     WHERE post_id IN
+           <foreach item="postId" collection="postIds" open="(" separator="," close=")">
+            #{postId}
+           </foreach>
+  </update>
+
+  <!--  status 기준 postList  -->
+  <select id="findPostIdsByStatus" resultType="com.example.demo.domain.Post">
+    SELECT * FROM posts WHERE status = #{status}
+  </select>
 
 
   <insert id="createPost" parameterType="com.example.demo.domain.Post">
