@@ -104,6 +104,34 @@
     SELECT * FROM posts WHERE status = #{status}
   </select>
 
+  <!-- postIds 기준 게시글 삭제 -->
+  <delete id="deletePostInPostId" parameterType="Long">
+    DELETE FROM posts WHERE post_id IN
+                            <foreach item="postId" collection="postIds" open="(" separator="," close=")">
+                                #{postId}
+                            </foreach>
+  </delete>
+
+
+  <select id="getPostByViewCount" parameterType="com.example.demo.domain.Post">
+    <![CDATA[
+        SELECT * FROM posts WHERE view_count < 10
+    ]]>
+  </select>
+
+  <delete id="deleteLowViewCount" >
+    <![CDATA[
+        DELETE FROM post WHERE view_count < 10
+    ]]>
+  </delete>
+
+  <select id="getPostByDate" parameterType="String" resultType="com.example.demo.domain.Post">
+    <![CDATA[
+        SELECT * FROM posts WHERE created_at < TO_DATE(#{date})
+    ]]>
+  </select>
+
+
 
   <insert id="createPost" parameterType="com.example.demo.domain.Post">
     INSERT INTO posts (post_id, user_id, title, content, status, view_count) VALUES (#{postId},#{userId},#{title}, #{content}, #{status} , #{viewCount})

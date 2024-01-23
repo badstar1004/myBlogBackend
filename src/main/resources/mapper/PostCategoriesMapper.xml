@@ -15,10 +15,6 @@
        WHERE C.name = '공지사항'
   </select>
 
-  <delete id="deletePostCategoriesByPost" parameterType="Long">
-      DELETE FROM postcategories WHERE post_id = #{postId}
-  </delete>
-
   <update id="updatePostCategoriesInPostIds" parameterType="long">
     UPDATE postcategories
        SET category_id = #{categoryId}
@@ -36,5 +32,18 @@
             #{postId}
            </foreach>
   </select>
+
+  <delete id="deletePostCategoriesInPost" parameterType="Long">
+    DELETE FROM postcategories WHERE post_id IN
+                                     <foreach item="postId" collection="postIds" open="(" separator="," close=")">
+                                        #{postId}
+                                     </foreach>
+  </delete>
+
+
+
+  <delete id="deletePostCategoriesByPost" parameterType="Long">
+    DELETE FROM postcategories WHERE post_id = #{postId}
+  </delete>
 
 </mapper>

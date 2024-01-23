@@ -11,6 +11,7 @@ import com.example.demo.dto.post.PostListDto;
 import com.example.demo.dto.post.PostTitleContentCreatedAtDto;
 import com.example.demo.dto.post.PostTitleCreatedAtDto;
 import com.example.demo.dto.post.PostTitleViewCountDto;
+import com.example.demo.dto.post.form.PostIdListForm;
 import com.example.demo.mapper.categories.CategoriesMapper;
 import com.example.demo.mapper.comment.CommentMapper;
 import com.example.demo.mapper.post.PostMapper;
@@ -180,6 +181,84 @@ public class PostService {
             postCategoriesMapper.updatePostCategoriesInPostIds(postIds, categories.getCategoryId());
 
         return updateCount > 0 ? postCategoriesMapper.getPostCategoriesInCategoryId(postIds) : null;
+    }
+
+    @Transactional
+    public int deletePostStatus() {
+        int totalDelete = 0;
+
+        // 'private' 게시물 조회
+        List<Post> postList = postMapper.findPostIdsByStatus("private");
+
+        List<Long> postIds = postList.stream().map(Post::getPostId).toList();
+
+        // 댓글, 대댓글 삭제
+        totalDelete += commentMapper.deleteCommentsInPostId(postIds);
+
+        // postCategories 삭제
+        totalDelete += postCategoriesMapper.deletePostCategoriesInPost(postIds);
+
+        // 게시물 삭제
+        totalDelete += postMapper.deletePostInPostId(postIds);
+
+        return totalDelete;
+    }
+
+    @Transactional
+    public int deletePostLowViewCount() {
+        int totalDelete = 0;
+        List<Post> postList = postMapper.getPostByViewCount();
+
+        List<Long> postIds = postList.stream().map(Post::getPostId).toList();
+
+        // 댓글, 대댓글 삭제
+        totalDelete += commentMapper.deleteCommentsInPostId(postIds);
+
+        // postCategories 삭제
+        totalDelete += postCategoriesMapper.deletePostCategoriesInPost(postIds);
+
+        // 게시물 삭제
+        totalDelete += postMapper.deletePostInPostId(postIds);
+
+        return totalDelete;
+    }
+
+    @Transactional
+    public int deletePoseByDate(String date) {
+        int totalDelete = 0;
+        List<Post> postList = postMapper.getPostByDate(date);
+
+        List<Long> postIds = postList.stream().map(Post::getPostId).toList();
+
+        // 댓글, 대댓글 삭제
+        totalDelete += commentMapper.deleteCommentsInPostId(postIds);
+
+        // postCategories 삭제
+        totalDelete += postCategoriesMapper.deletePostCategoriesInPost(postIds);
+
+        // 게시물 삭제
+        totalDelete += postMapper.deletePostInPostId(postIds);
+
+        return totalDelete;
+    }
+
+    @Transactional
+    public int deleteManyPosts(PostIdListForm postIdListForm) {
+        int totalDelete = 0;
+
+        List<Post> postList = postMapper.getPostInPostIds(postIdListForm.getPostIdList());
+        List<Long> postIds = postList.stream().map(Post::getPostId).toList();
+
+        // 댓글, 대댓글 삭제
+        totalDelete += commentMapper.deleteCommentsInPostId(postIds);
+
+        // postCategories 삭제
+        totalDelete += postCategoriesMapper.deletePostCategoriesInPost(postIds);
+
+        // 게시물 삭제
+        totalDelete += postMapper.deletePostInPostId(postIds);
+
+        return totalDelete;
     }
 }
 

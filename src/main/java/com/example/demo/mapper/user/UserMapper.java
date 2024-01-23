@@ -15,4 +15,6 @@ public interface UserMapper {
     List<User> getAllUser();
 
     List<User> getUserPaging(Map<String, Object> pagingMap);
+
+    int deleteUser(Long userId);
 }

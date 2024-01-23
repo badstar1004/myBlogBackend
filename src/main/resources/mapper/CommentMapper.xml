@@ -16,7 +16,48 @@
                            ORDER BY post_id
   </select>
 
+  <!-- postIds 기준 댓글 삭제 -->
+  <delete id="deleteCommentsInPostId" parameterType="Long">
+    DELETE FROM comments WHERE post_id IN
+                               <foreach item="postId" collection="postIds" open="(" separator="," close=")">
+                                #{postId}
+                               </foreach>
+  </delete>
+
+  <!-- userId 기준 댓글 삭제 -->
+  <delete id="deleteCommentsByUserId" parameterType="Long">
+    DELETE FROM comments WHERE user_id = #{userId}
+  </delete>
+
 	<delete id="deleteCommentsByPost" parameterType="Long">
         DELETE FROM comments WHERE post_id = #{postId}
   </delete>
+
+
+  <delete id="deleteCommentsByDate">
+    <![CDATA[
+        DELETE FROM comments WHERE created_at < add_months(CURRENT_DATE, -1)
+    ]]>
+  </delete>
+
+
+  <select id="getCommentsByUserId" resultType="com.example.demo.domain.Comments">
+    SELECT * FROM comments WHERE user_id = #{userId}
+  </select>
+
+  <!--  -->
+  <select id="getCommentsByUserIdAndInCommentId" resultType="com.example.demo.domain.Comments">
+    SELECT * FROM comments WHERE user_id != #{userId} AND parent_comment_id IN
+                                 <foreach item="commentId" collection="commentIds" open="(" separator="," close=")">
+                                    #{commentId}
+                                 </foreach>
+  </select>
+
+  <delete id="deleteCommentsByCommentId" parameterType="Long">
+    DELETE FROM comments WHERE comment_id IN
+                               <foreach item="commentId" collection="commentIds" open="(" separator="," close=")">
+                                #{commentId}
+                               </foreach>
+  </delete>
+
 </mapper>
