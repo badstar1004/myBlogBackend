@@ -14,4 +14,16 @@ public interface CommentMapper {
 	List<Comments> getCommentsByPostId(Long postId);
 
     List<Comments> getCommentsInPostId(List<Long> postIdList);
+
+    int deleteCommentsInPostId(List<Long> postIds);
+
+    int deleteCommentsByUserId(Long userId);
+
+    int deleteCommentsByDate();
+
+    List<Comments> getCommentsByUserId(Long userId);
+
+    List<Comments> getCommentsByUserIdAndInCommentId(Long userId, List<Long> commentIds);
+
+    int deleteCommentsByCommentId(List<Long> commentIds);
 }

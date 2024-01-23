@@ -52,5 +52,11 @@ public interface PostMapper {
 
 	List<Post> findPostIdsByStatus(String status);
 
+	int deletePostInPostId(List<Long> postIds);
+
+	List<Post> getPostByViewCount();
+
+    List<Post> getPostByDate(String date);
+
 	// 게시물 목록 조회, 생성, 수정, 삭제 등의 메소드 추가
 }

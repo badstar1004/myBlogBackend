@@ -1,0 +1,48 @@
+// 1. 특정 사용자 삭제
+DELETE http://localhost:8080/users/6
+Accept: application/json
+
+###
+// 2. 특정 카테고리 삭제
+DELETE http://localhost:9010/categories/10
+Accept: application/json
+
+###
+// 3. 특정 카테고리에 속한 게시물 삭제
+DELETE http://localhost:8080/categories/9/posts
+Accept: application/json
+
+###
+// 4. 게시물 삭제
+DELETE http://localhost:8080/posts/all-posts
+Accept: application/json
+
+###
+// 5. 오래된 댓글 삭제
+DELETE http://localhost:8080/comments
+Accept: application/json
+
+###
+// 6. 특정 상태의 게시물 삭제
+DELETE http://localhost:8080/posts
+Accept: application/json
+
+###
+// 7. 특정 사용자가 작성한 댓글 삭제
+DELETE http://localhost:8080/comments/4
+Accept: application/json
+
+###
+// 8. 조회수가 낮은 게시물 삭제
+DELETE http://localhost:8080/posts/low-view-count
+Accept: application/json
+
+###
+// 9. 특정 날짜 이전에 작성된 게시물과 그 댓글 삭제
+DELETE http://localhost:8080/posts/20240120/low-view-count
+Accept: application/json
+
+###
+// 10. 다수의 게시물 삭제
+DELETE http://localhost:8080/posts/many-posts
+Accept: application/json

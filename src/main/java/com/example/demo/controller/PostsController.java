@@ -5,6 +5,7 @@ import com.example.demo.domain.Post;
 import com.example.demo.domain.PostCategories;
 import com.example.demo.dto.post.PostByCategoriesDto;
 import com.example.demo.dto.post.PostCommentCountDto;
+import com.example.demo.dto.post.form.PostIdListForm;
 import com.example.demo.dto.post.PostListDto;
 import com.example.demo.dto.post.PostTitleCreatedAtDto;
 import com.example.demo.dto.post.PostTitleViewCountDto;
@@ -181,7 +182,60 @@ public class PostsController {
         return new ResponseEntity<>(postCategoriesList, HttpStatus.OK);
     }
 
+    // 삭제
+    // 4. 게시물 삭제
+    @DeleteMapping("all-posts")
+    public ResponseEntity<String> deleteAllPosts() {
+        if(postsService.deleteAllPosts() < 0) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
 
+        return new ResponseEntity<>("삭제되었습니다.", HttpStatus.OK);
+    }
+
+    // 삭제
+    // 6. 특정 상태의 게시물 삭제
+    @DeleteMapping
+    public ResponseEntity<String> deletePostStatus() {
+        if(postsService.deletePostStatus() < 0) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        return new ResponseEntity<>("삭제되었습니다.", HttpStatus.OK);
+    }
+
+    // 삭제
+    // 8. 조회수가 낮은 게시물 삭제
+    @DeleteMapping("/low-view-count")
+    public ResponseEntity<String> deletePostLowViewCount() {
+        if(postsService.deletePostLowViewCount() < 0) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        return new ResponseEntity<>("삭제되었습니다.", HttpStatus.OK);
+    }
+
+    // 삭제
+    // 9. 특정 날짜 이전에 작성된 게시물과 그 댓글 삭제
+    @DeleteMapping("/{date}/low-view-count")
+    public ResponseEntity<String> deletePostLowViewCount(@PathVariable String date) {
+        if(postsService.deletePoseByDate(date) < 0) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        return new ResponseEntity<>("삭제되었습니다.", HttpStatus.OK);
+    }
+
+    // 삭제
+    // 10. 다수의 게시물 삭제
+    @DeleteMapping("/many-posts")
+    public ResponseEntity<String> deleteManyPosts(@RequestBody PostIdListForm postIdListForm) {
+        if(postsService.deleteManyPosts(postIdListForm) < 0) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        return new ResponseEntity<>("삭제되었습니다.", HttpStatus.OK);
+    }
 
 
 

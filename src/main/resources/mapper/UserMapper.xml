@@ -29,4 +29,8 @@
         </if>
     </select>
 
+    <delete id="deleteUser" parameterType="Long">
+        DELETE FROM userprofile WHERE user_id = #{userId}
+    </delete>
+
 </mapper>

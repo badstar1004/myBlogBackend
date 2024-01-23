@@ -17,4 +17,6 @@ public interface PostCategoriesMapper {
 	int updatePostCategoriesInPostIds(List<Long> postIds, Long categoryId);
 
 	List<PostCategories> getPostCategoriesInCategoryId(List<Long> postIds);
+
+    int deletePostCategoriesInPost(List<Long> postIds);
 }

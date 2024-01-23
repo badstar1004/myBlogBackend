@@ -13,4 +13,9 @@
     SELECT * FROM categories WHERE name = #{name}
   </select>
 
+  <!-- categoryId 기준 삭제 -->
+  <delete id="deleteCategory" parameterType="long">
+    DELETE * FROM categories WHERE category_id = #{categoryId}
+  </delete>
+
 </mapper>
