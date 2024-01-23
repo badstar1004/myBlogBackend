@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -74,6 +75,18 @@ public class UserController {
         if(usersPaging == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
         return new ResponseEntity<>(usersPaging, HttpStatus.OK);
+    }
+
+    // 삭제 - 댓글을 삭제하는 경우 댓글에 대댓글이 있는 경우도 포함할 수 있게 삭제 로직을 구성
+    // 1. 특정 사용자 삭제
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
+        if(userService.deleteUser(userId) <= 0) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        return new ResponseEntity<>("삭제되었습니다.", HttpStatus.OK);
     }
 }

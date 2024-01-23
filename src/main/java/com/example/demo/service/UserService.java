@@ -6,12 +6,16 @@ import com.example.demo.dto.post.PostTitleContentCreatedAtDto;
 import com.example.demo.dto.post.PostTitleCreatedAtDto;
 import com.example.demo.dto.user.UserPostCount;
 import com.example.demo.dto.user.UserPostListDto;
+import com.example.demo.mapper.comment.CommentMapper;
+import com.example.demo.mapper.post.PostMapper;
+import com.example.demo.mapper.postcategories.PostCategoriesMapper;
 import com.example.demo.mapper.user.UserMapper;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
@@ -21,6 +25,16 @@ public class UserService {
 
     @Autowired
     private PostService postService;
+
+    @Autowired
+    private PostMapper postMapper;
+
+    @Autowired
+    private CommentMapper commentMapper;
+
+    @Autowired
+    PostCategoriesMapper postCategoriesMapper;
+
 
     // user의 게시물 조회
     public UserPostListDto getUserPostList(Long userId) {
@@ -63,5 +77,34 @@ public class UserService {
 
     public List<User> getUsersPaging(Map<String, Object> pagingMap) {
         return userMapper.getUserPaging(pagingMap);
+    }
+
+    @Transactional
+    public int deleteUser(Long userId) {
+        int totalDeleted = 0;
+
+        // 작성한 게시물 조회
+        List<Post> postList = postMapper.getPostByUserId(userId);
+
+        if(!postList.isEmpty()) {
+            // 작성한 게시물들의 댓글, 대댓글 삭제 및 작성한 댓글, 대댓글 삭제
+            List<Long> postIds = postList.stream()
+                .map(Post::getPostId)
+                .toList();
+
+            totalDeleted += commentMapper.deleteCommentsInPostId(postIds);
+            totalDeleted += commentMapper.deleteCommentsByUserId(userId);
+
+            // PostCategories 삭제
+            totalDeleted += postCategoriesMapper.deletePostCategoriesInPost(postIds);
+
+            // 게시글 삭제
+            totalDeleted += postMapper.deletePostInPostId(postIds);
+
+            // 유저 삭제
+            totalDeleted += userMapper.deleteUser(userId);
+        }
+
+        return totalDeleted;
     }
 }

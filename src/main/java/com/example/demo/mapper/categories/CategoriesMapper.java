@@ -1,7 +1,6 @@
 package com.example.demo.mapper.categories;
 
 import com.example.demo.domain.Categories;
-import com.example.demo.dto.post.PostTitleViewCountDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -10,6 +9,5 @@ import org.springframework.stereotype.Repository;
 public interface CategoriesMapper {
     Categories getCategoriesByName(String name);
 
-    PostTitleViewCountDto getCategoriesById(Long categoryId);
-
+    int deleteCategory(Long categoryId);
 }
