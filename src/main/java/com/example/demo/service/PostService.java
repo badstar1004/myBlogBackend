@@ -260,6 +260,24 @@ public class PostService {
 
         return totalDelete;
     }
+
+    @Transactional
+    public int deleteAllPosts() {
+        int totalDelete = 0;
+        List<Post> postList = postMapper.getAllPosts();
+        List<Long> postIds = postList.stream().map(Post::getPostId).toList();
+
+        // 댓글, 대댓글 삭제
+        totalDelete += commentMapper.deleteCommentsInPostId(postIds);
+
+        // postCategories 삭제
+        totalDelete += postCategoriesMapper.deletePostCategoriesInPost(postIds);
+
+        // 게시물 삭제
+        totalDelete += postMapper.deletePostInPostId(postIds);
+
+        return totalDelete;
+    }
 }
 
 

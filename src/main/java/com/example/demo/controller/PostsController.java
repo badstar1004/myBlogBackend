@@ -183,6 +183,17 @@ public class PostsController {
     }
 
     // 삭제
+    // 4. 게시물 삭제
+    @DeleteMapping("all-posts")
+    public ResponseEntity<String> deleteAllPosts() {
+        if(postsService.deleteAllPosts() < 0) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        return new ResponseEntity<>("삭제되었습니다.", HttpStatus.OK);
+    }
+
+    // 삭제
     // 6. 특정 상태의 게시물 삭제
     @DeleteMapping
     public ResponseEntity<String> deletePostStatus() {
@@ -225,7 +236,6 @@ public class PostsController {
 
         return new ResponseEntity<>("삭제되었습니다.", HttpStatus.OK);
     }
-
 
 
 
