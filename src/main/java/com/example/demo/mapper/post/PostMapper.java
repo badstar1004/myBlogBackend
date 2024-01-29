@@ -5,8 +5,8 @@ import com.example.demo.dto.post.PostListDto;
 import com.example.demo.dto.post.PostTitleContentCreatedAtDto;
 import com.example.demo.dto.post.PostTitleCreatedAtDto;
 import com.example.demo.dto.post.PostTitleViewCountDto;
+import com.example.demo.dto.post.form.PostSortForm;
 import java.util.List;
-import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -24,9 +24,9 @@ public interface PostMapper {
 
 	List<Post> getPostByUserId(Long userId);
 
-	int createPost(Post post);
+	void createPost(Post post);
 
-	int updatePost(Long postId, Post post);
+	int updatePost(Post post);
 
 	int deletePost(Long postId);
 
@@ -42,7 +42,7 @@ public interface PostMapper {
 
     List<PostTitleCreatedAtDto> getPostPeriod();
 
-    List<Post> getPostsPaging(Map<String, Object> pagingMap);
+    List<Post> getPostsPaging(PostSortForm postSortForm);
 
 	int updatePostViewCount(Long postId);
 
@@ -57,6 +57,10 @@ public interface PostMapper {
 	List<Post> getPostByViewCount();
 
     List<Post> getPostByDate(String date);
+
+	List<Post> getMostCommentsPosts();
+
+	List<Post> getMostViewCountPosts();
 
 	// 게시물 목록 조회, 생성, 수정, 삭제 등의 메소드 추가
 }
