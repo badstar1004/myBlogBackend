@@ -3,16 +3,16 @@ package com.example.demo.controller;
 import com.example.demo.domain.Comments;
 import com.example.demo.domain.Post;
 import com.example.demo.domain.PostCategories;
+import com.example.demo.dto.post.PopularPostsDto;
 import com.example.demo.dto.post.PostByCategoriesDto;
 import com.example.demo.dto.post.PostCommentCountDto;
-import com.example.demo.dto.post.form.PostIdListForm;
 import com.example.demo.dto.post.PostListDto;
 import com.example.demo.dto.post.PostTitleCreatedAtDto;
 import com.example.demo.dto.post.PostTitleViewCountDto;
+import com.example.demo.dto.post.form.PostIdListForm;
+import com.example.demo.dto.post.form.PostSortForm;
 import com.example.demo.service.PostService;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -43,8 +42,11 @@ public class PostsController {
     // 게시물 생성 (POST)
     @PostMapping // http method 설정
     public ResponseEntity<Post> createPost(@RequestBody Post post) {
-        	postsService.createPost(post);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        Post postData = postsService.createPost(post);
+        if(postData == null || postData.getPostId() == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(postData, HttpStatus.CREATED);
     }
 
     // 모든 게시물 조회
@@ -125,20 +127,10 @@ public class PostsController {
     }
 
     // 11. 다수의 게시물 조회
-    @GetMapping("/posts-paging")
-    public ResponseEntity<List<Post>> getPostsPaging(
-        @RequestParam(required = false) List<String> sort,
-        @RequestParam(required = false) List<String> order,
-        @RequestParam(required = false) Long page,
-        @RequestParam(required = false) Long offset) {
+    @PostMapping("/posts-paging")
+    public ResponseEntity<List<Post>> getPostsPaging(@RequestBody PostSortForm postSortForm) {
 
-        Map<String, Object> pagingMap = new HashMap<>();
-        pagingMap.put("sort", sort);
-        pagingMap.put("order", order);
-        pagingMap.put("page", page);
-        pagingMap.put("offset", offset);
-
-        List<Post> postsPaging = postsService.getPostsPaging(pagingMap);
+        List<Post> postsPaging = postsService.getPostsPaging(postSortForm);
         if(postsPaging == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -230,7 +222,7 @@ public class PostsController {
     // 10. 다수의 게시물 삭제
     @DeleteMapping("/many-posts")
     public ResponseEntity<String> deleteManyPosts(@RequestBody PostIdListForm postIdListForm) {
-        if(postsService.deleteManyPosts(postIdListForm) < 0) {
+        if(postsService.deleteManyPosts(postIdListForm) <= 0) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
@@ -252,23 +244,35 @@ public class PostsController {
 
     // 게시물 수정 (PUT)
     @PutMapping("/{postId}")
-    public ResponseEntity<Post> updatePost(@PathVariable(name="postId") Long postId, Post updatedPost) {
+    public ResponseEntity<String> updatePost(@PathVariable(name="postId") Long postId, @RequestBody Post updatedPost) {
         int postUpdateCount = postsService.updatePost(postId, updatedPost);
-        if (postUpdateCount <= 0) {
-            return new ResponseEntity<>(HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if(postUpdateCount <= 0) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
+
+        return new ResponseEntity<>("수정되었습니다.",HttpStatus.OK);
     }
 
     // 게시물 삭제 (DELETE)
     @DeleteMapping("/{postId}")
     public ResponseEntity<Void> deletePost(@PathVariable(name="postId") Long postId) {
         int postDeleteCount= postsService.deletePost(postId);
-        if (postDeleteCount<= 0) {
+        if (postDeleteCount <= 0) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } else {
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+    // 4. 게시물 하이라이트 영역 – 1주 동안 가장 댓글이 많은 글 2개, 가장 조회수가 많은 글 2개를 각각 인기글로 포스팅한다.
+    @GetMapping("/highlight")
+    public ResponseEntity<PopularPostsDto> getHighLight() {
+        PopularPostsDto postList = postsService.getHighLight();
+        if(postList == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
+        return new ResponseEntity<>(postList, HttpStatus.OK);
     }
 }

@@ -4,6 +4,7 @@ import com.example.demo.domain.Categories;
 import com.example.demo.domain.Comments;
 import com.example.demo.domain.Post;
 import com.example.demo.domain.PostCategories;
+import com.example.demo.dto.post.PopularPostsDto;
 import com.example.demo.dto.post.PostByCategoriesDto;
 import com.example.demo.dto.post.PostCommentCountDto;
 import com.example.demo.dto.post.PostDto;
@@ -12,6 +13,7 @@ import com.example.demo.dto.post.PostTitleContentCreatedAtDto;
 import com.example.demo.dto.post.PostTitleCreatedAtDto;
 import com.example.demo.dto.post.PostTitleViewCountDto;
 import com.example.demo.dto.post.form.PostIdListForm;
+import com.example.demo.dto.post.form.PostSortForm;
 import com.example.demo.mapper.categories.CategoriesMapper;
 import com.example.demo.mapper.comment.CommentMapper;
 import com.example.demo.mapper.post.PostMapper;
@@ -56,13 +58,15 @@ public class PostService {
     }
 
     // 게시물 생성 메서드
-    public int createPost(Post post) {
-        return postMapper.createPost(post);
+    public Post createPost(Post post) {
+        postMapper.createPost(post); // postId는 자동 업데이트
+        return post; // 업데이트된 post 객체를 반환
     }
 
     // 게시물 수정 메서드
+    @Transactional
     public int updatePost(Long postId, Post post) {
-        return postMapper.updatePost(postId, post);
+        return postMapper.updatePost(post);
     }
 
     // 게시물 삭제 메서드
@@ -144,8 +148,8 @@ public class PostService {
         return postMapper.getPostPeriod();
     }
 
-    public List<Post> getPostsPaging(Map<String, Object> pagingMap) {
-        return postMapper.getPostsPaging(pagingMap);
+    public List<Post> getPostsPaging(PostSortForm postSortForm) {
+        return postMapper.getPostsPaging(postSortForm);
     }
 
     // 조회수 업데이트
@@ -277,6 +281,23 @@ public class PostService {
         totalDelete += postMapper.deletePostInPostId(postIds);
 
         return totalDelete;
+    }
+
+    // 게시물 하이라이트 영역
+    public PopularPostsDto getHighLight() {
+        // 1주 동안 가장 댓글이 많은 글 2개
+        List<Post> mostCommentsPosts = postMapper.getMostCommentsPosts();
+        List<Long> postIds = mostCommentsPosts.stream().map(Post::getPostId).toList();
+
+        // 1주 동안 가장 조회수가 많은 글 4개
+        List<Post> mostViewCountPosts = postMapper.getMostViewCountPosts();
+        List<Post> exceptMostViewCountPosts =
+            mostViewCountPosts.stream().filter(post -> !postIds.contains(post.getPostId())).toList();
+
+        return PopularPostsDto.builder()
+            .mostCommentsPosts(mostCommentsPosts)
+            .mostViewCountPosts(exceptMostViewCountPosts)
+            .build();
     }
 }
 
