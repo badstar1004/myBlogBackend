@@ -8,7 +8,7 @@
   </select>
 
   <select id="getAllPosts" resultType="com.example.demo.domain.Post">
-    SELECT * FROM posts
+    SELECT * FROM posts ORDER BY post_id
   </select>
 
   <!--  public 게시물  -->
@@ -65,8 +65,8 @@
       FROM posts
       <if test="sort != null and sort.size() > 0">
         ORDER BY
-            <foreach item="criteria" collection="sort" separator=",">
-                ${criteria} ${order[sort.indexOf(criteria)]}
+            <foreach item="s" collection="sort" separator=",">
+                ${s} ${order[sort.indexOf(s)]}
             </foreach>
       </if>
       <if test="offset != null">
@@ -133,16 +133,70 @@
 
 
 
-  <insert id="createPost" parameterType="com.example.demo.domain.Post">
-    INSERT INTO posts (post_id, user_id, title, content, status, view_count) VALUES (#{postId},#{userId},#{title}, #{content}, #{status} , #{viewCount})
+  <insert id="createPost" parameterType="com.example.demo.domain.Post" useGeneratedKeys="true" keyProperty="postId" keyColumn="POST_ID">
+    INSERT INTO posts (user_id, title, content, status) VALUES (#{userId}, #{title}, #{content}, #{status})
   </insert>
 
   <update id="updatePost" parameterType="com.example.demo.domain.Post">
-    UPDATE posts SET title = #{title}, content = #{content} WHERE post_id = #{postId}
+    UPDATE posts SET title = #{title}, content = #{content}, updated_at = current_date WHERE post_id = #{postId}
   </update>
 
   <delete id="deletePost" parameterType="Long">
     DELETE FROM posts WHERE post_id = #{postId}
   </delete>
+
+  <!-- 1주 동안 가장 댓글이 많은 글 2개 -->
+  <!-- 오라클 CLOB 타입 GROUP BY 안걸림 -> INNER JOIN 으로 처리 -->
+  <select id="getMostCommentsPosts" resultType="com.example.demo.domain.Post">
+    <![CDATA[
+    SELECT p.post_id
+         , p.user_id
+         , p.title
+         , p.CONTENT
+         , p.view_count
+         , p.status
+         , p.IMAGE_URL
+         , p.created_at
+      FROM posts 	p
+INNER JOIN (SELECT post_id
+                 , comment_count
+              FROM (SELECT p.post_id
+                         , COUNT(c.comment_id) AS comment_count
+                      FROM posts 			p
+                 LEFT JOIN comments 		c
+                        ON p.post_id 		= c.post_id
+                     WHERE p.created_at 	>= SYSDATE - 7
+                  GROUP BY p.post_id
+                  ORDER BY COUNT(c.comment_id) DESC)
+             WHERE ROWNUM <= 2)		SUB
+        ON p.post_id 	= sub.post_id
+  ORDER BY sub.comment_count DESC
+    ]]>
+  </select>
+
+  <!-- 1주 동안 가장 조회수가 많은 글 4개 -->
+  <!-- 오라클 CLOB 타입 GROUP BY 안걸림 -> INNER JOIN 으로 처리 -->
+  <select id="getMostViewCountPosts" resultType="com.example.demo.domain.Post">
+    <![CDATA[
+    SELECT p.post_id
+         , p.user_id
+         , p.title
+         , p.CONTENT
+         , p.view_count
+         , p.status
+         , p.IMAGE_URL
+         , p.created_at
+      FROM posts 	p
+INNER JOIN (SELECT post_id
+                 , VIEW_COUNT
+              FROM (SELECT post_id
+                         , VIEW_COUNT
+                      FROM posts
+                  ORDER BY VIEW_COUNT DESC)
+             WHERE ROWNUM <= 4)		SUB
+        ON p.post_id 	= sub.post_id
+  ORDER BY sub.VIEW_COUNT DESC
+    ]]>
+  </select>
 
 </mapper>

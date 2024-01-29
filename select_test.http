@@ -57,3 +57,7 @@ Accept: application/json
 GET http://localhost:8080/users/users-paging
 Accept: application/json
 
+###
+// 4. 게시물 하이라이트 영역 – 1주 동안 가장 댓글이 많은 글 2개, 가장 조회수가 많은 글 2개를 각각 인기글로 포스팅한다.
+GET http://localhost:8080/posts/highlight
+Accept: application/json
