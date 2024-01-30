@@ -155,6 +155,7 @@
          , p.CONTENT
          , p.view_count
          , p.status
+         , p.category_name
          , p.IMAGE_URL
          , p.created_at
       FROM posts 	p
@@ -184,6 +185,7 @@ INNER JOIN (SELECT post_id
          , p.CONTENT
          , p.view_count
          , p.status
+         , p.category_name
          , p.IMAGE_URL
          , p.created_at
       FROM posts 	p
